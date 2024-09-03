@@ -257,10 +257,7 @@ func (p *Postgres) RegisterUser(user user.User) error {
 	if err != nil {
 		return err
 	}
-	err = p.SetWalletBalance(10000.0, id)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 func (p *Postgres) LoginUser(email, password string) (uuid.UUID, error) {
@@ -301,7 +298,7 @@ func (p *Postgres) checkUnique(name, email string) (bool, error) {
 
 func (p *Postgres) setBalance(userID uuid.UUID) error {
 	query := `INSERT INTO wallet_table  (user_id,money) VALUES ($1 , $2)`
-	_, err := p.db.Exec(query, userID, 0.0)
+	_, err := p.db.Exec(query, userID, 10000.0)
 	if err != nil {
 		return err
 	}
