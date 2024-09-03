@@ -6,17 +6,19 @@ import (
 	"github.com/janicaleksander/StocksHelp/httpapi"
 	"github.com/janicaleksander/StocksHelp/market"
 	"github.com/janicaleksander/StocksHelp/stockapi"
-	"github.com/joho/godotenv"
 	"log"
 )
 
 func main() {
-	err := godotenv.Load()
+	/*	err := godotenv.Load()
 
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		}*/
 	databaseAPI, err := db.NewDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	databaseAPI.Init()
 
 	hub := stockapi.NewHub(databaseAPI)

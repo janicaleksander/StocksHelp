@@ -3,7 +3,6 @@ package auth
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"net/http"
 	"os"
 	"time"
@@ -26,10 +25,10 @@ func CreateJWTCookieUser(w http.ResponseWriter, r *http.Request, userID uuid.UUI
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}}
 
-	err := godotenv.Load()
-	if err != nil {
-		return err
-	}
+	/*	err := godotenv.Load()
+		if err != nil {
+			return err
+		}*/
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {

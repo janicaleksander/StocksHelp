@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/janicaleksander/StocksHelp/stockapi"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 )
@@ -42,10 +41,10 @@ func makeHandler(f apiFunc) http.HandlerFunc {
 }
 
 func (serv *Server) Run() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	/*	err := godotenv.Load()
+		if err != nil {
+			log.Fatal(err)
+		}*/
 	router := http.NewServeMux()
 	fs := http.FileServer(http.Dir("static"))
 	router.Handle("/static/", http.StripPrefix("/static/", fs))

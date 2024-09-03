@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/janicaleksander/StocksHelp/customType"
 	"github.com/janicaleksander/StocksHelp/user"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -44,10 +43,10 @@ type Postgres struct {
 
 func NewDB() (*Postgres, error) {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	/*	err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}*/
 
 	dbUser := os.Getenv("DBUSER")
 	dbPassword := os.Getenv("DBPASSWORD")
