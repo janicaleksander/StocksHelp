@@ -1,20 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"github.com/janicaleksander/StocksHelp/db"
 	"github.com/janicaleksander/StocksHelp/external"
 	"github.com/janicaleksander/StocksHelp/httpapi"
 	"github.com/janicaleksander/StocksHelp/market"
 	"github.com/janicaleksander/StocksHelp/stockapi"
 	"log"
+	"os"
 )
 
 func main() {
-	/*	err := godotenv.Load()
+	// Load environment variables if needed
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
 
-		if err != nil {
-			log.Fatalf("Error loading .env file: %v", err)
-		}*/
 	databaseAPI, err := db.NewDB()
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +31,13 @@ func main() {
 
 	go hub.Run()
 	go mockExchange.MockGenerate()
-	server := httpapi.NewServer("0.0.0.0:8080", hub)
-	server.Run()
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	address := fmt.Sprintf("0.0.0.0:%s", port)
+	server := httpapi.NewServer(address, hub)
+	server.Run()
 }
