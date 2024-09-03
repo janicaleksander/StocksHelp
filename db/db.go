@@ -35,6 +35,7 @@ type Storage interface {
 	GetYourStocks(userID uuid.UUID) (map[string]float64, error)
 	GetUsername(userID uuid.UUID) (string, error)
 	SetWalletBalance(x float64, userID uuid.UUID) error
+	GetHistory(userID uuid.UUID) ([]customType.TransactionHistory, error)
 }
 
 type Postgres struct {
@@ -503,4 +504,36 @@ func (p *Postgres) GetUsername(userID uuid.UUID) (string, error) {
 		return "", err
 	}
 	return username, nil
+}
+func (p *Postgres) GetHistory(userID uuid.UUID) ([]customType.TransactionHistory, error) {
+	query := `SELECT resource,quantity,purchase_price,selling_price,purchase,sale,transaction_time FROM history_table WHERE user_id=$1`
+	rows, err := p.db.Query(query, userID)
+	if err != nil {
+		return []customType.TransactionHistory{}, err
+	}
+	var s []customType.TransactionHistory
+	for rows.Next() {
+		var t customType.TransactionHistory
+		var Resource string
+		var Quantity float64
+		var PurchasePrice float64
+		var SellingPrice float64
+		var Purchase bool
+		var Sale bool
+		var TransactionTime time.Time
+		err := rows.Scan(&Resource, &Quantity, &PurchasePrice, &SellingPrice, &Purchase, &Sale, &TransactionTime)
+		if err != nil {
+			continue
+		}
+		t.Resource = Resource
+		t.Quantity = Quantity
+		t.PurchasePrice = PurchasePrice
+		t.SellingPrice = SellingPrice
+		t.Purchase = Purchase
+		t.Sale = Sale
+		t.TransactionTime = TransactionTime
+		s = append(s, t)
+	}
+	return s, nil
+
 }

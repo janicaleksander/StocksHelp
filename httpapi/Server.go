@@ -67,6 +67,7 @@ func (serv *Server) Run() {
 	router.HandleFunc("/wallet", makeHandler(serv.wallet))
 	router.HandleFunc("/walletCalculate", makeHandler(serv.walletCalculate))
 	router.HandleFunc("/logout", makeHandler(serv.Logout))
+	router.HandleFunc("/history", makeHandler(serv.history))
 
 	log.Printf("Listening to %s \n", serv.listenAddress)
 	log.Fatal(http.ListenAndServe(serv.listenAddress, router))

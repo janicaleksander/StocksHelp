@@ -1,0 +1,11 @@
+<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Transaction History</title><link href=\"./static/css/tailwind.css\" rel=\"stylesheet\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&amp;display=swap\" rel=\"stylesheet\"><link href=\"https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css\" rel=\"stylesheet\"><script src=\"https://cdn.jsdelivr.net/npm/apexcharts\"></script><script src=\"https://unpkg.com/htmx.org@2.0.2\" integrity=\"sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ\" crossorigin=\"anonymous\"></script><script>\r\n        htmx.onLoad(function(content) {\r\n            initFlowbite();\r\n        });\r\n    </script></head><body class=\"bg-gradient-to-r from-indigo-50 to-blue-100 font-sans leading-relaxed min-h-screen flex items-center justify-center\"><div class=\"max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-lg\"><div class=\"mb-6\"><h1 class=\"text-4xl font-bold text-gray-800\">Your Transaction History</h1></div><div class=\"space-y-4\">
+<div class=\"bg-white p-5 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300\"><div class=\"flex items-center justify-between mb-4\"><span class=\"text-2xl font-semibold text-gray-900\">
+</span> 
+<span class=\"inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-3 py-1 rounded-full\">BUY</span><div class=\"text-gray-700\">Purchase Price: 
+</div>
+<span class=\"inline-flex items-center bg-red-100 text-red-800 text-xs font-medium mr-2 px-3 py-1 rounded-full\">SELL</span><div class=\"text-gray-700\">Selling Price: 
+</div>
+</div><div class=\"text-gray-600 text-sm\">
+Transaction Time: 
+</div></div>
+</div></div><!-- Flowbite JS --><script src=\"https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js\"></script></body></html>

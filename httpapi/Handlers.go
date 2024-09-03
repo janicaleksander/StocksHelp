@@ -406,3 +406,16 @@ func (serv *Server) Logout(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("HX-Redirect", "/home")
 	return nil
 }
+
+func (serv *Server) history(w http.ResponseWriter, r *http.Request) error {
+	id, err := GetUserID(r)
+	if err != nil {
+		return err
+	}
+	s, err := serv.Hub.Storage.GetHistory(id)
+	if err != nil {
+		return err
+	}
+
+	return Render(w, r, components.History(s))
+}
