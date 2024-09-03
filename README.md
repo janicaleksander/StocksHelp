@@ -4,7 +4,7 @@ StocksMaster is a stock market simulator.
 
 ## Technologies
 
-- **Backend:** Go (Golang)
+- **Backend:** Golang
 - **Styling:** Tailwind CSS
 - **Performance Optimization:** htmx
 - **Page Rendering:** Templ
