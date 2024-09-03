@@ -1,4 +1,4 @@
-# StocksHelp
+# StocksMaster
 
 StocksMaster is a stock market simulator. 
 
