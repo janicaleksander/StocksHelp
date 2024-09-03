@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@preline/combobox": "^2.4.1",
+    "apexcharts": "^3.52.0",
+    "flowbite": "^2.5.1",
+    "htmx.org": "^2.0.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.10"
+  }
+}

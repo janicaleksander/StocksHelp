@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/janicaleksander/StocksHelp/customType"
 	"github.com/janicaleksander/StocksHelp/user"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -25,6 +27,14 @@ type Storage interface {
 	LoginUser(email, password string) (uuid.UUID, error)
 	SellResource(userID uuid.UUID, name string, q float64, sellingPrice float64) error
 	BuyResource(userID uuid.UUID, name string, q float64, purchasePrice float64) error
+	CheckBalance(userID uuid.UUID) (float64, error)
+	UpdateWalletBalance(x float64, userID uuid.UUID) error
+	GetCurrencyList() ([]string, error)
+	ChartData(name string) ([]customType.ChartStockInfo, error)
+	GetCurrencyOwnState(id uuid.UUID, name string) (float64, error)
+	GetYourStocks(userID uuid.UUID) (map[string]float64, error)
+	GetUsername(userID uuid.UUID) (string, error)
+	SetWalletBalance(x float64, userID uuid.UUID) error
 }
 
 type Postgres struct {
@@ -67,6 +77,7 @@ func (p *Postgres) Init() {
 	p.CreateResourceTable()
 	p.CreateWalletTable()
 	p.CreateHistoryTable()
+	p.CreateCurrencyHistoryTable()
 
 }
 
@@ -141,6 +152,21 @@ func (p *Postgres) CreateUserTable() {
 	}
 
 }
+
+func (p *Postgres) CreateCurrencyHistoryTable() {
+	query := `CREATE TABLE IF NOT EXISTS currency_history (
+        id SERIAL PRIMARY KEY,       
+        currency_name VARCHAR(50) NOT NULL,
+        exchange_price DECIMAL(18, 6) NOT NULL,
+        time_at TIMESTAMPTZ DEFAULT NOW()  
+    );`
+
+	_, err := p.db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (p *Postgres) SetDefault(m map[string]float64) error {
 	s := generateDefaultInsertQuery(m)
 	_, err := p.db.Exec(s)
@@ -153,6 +179,11 @@ func (p *Postgres) SetDefault(m map[string]float64) error {
 func (p *Postgres) UpdatePrice(name string, price float64) error {
 	query := `UPDATE currency_table SET exchange_price_prev = exchange_price, exchange_price = $1 WHERE currency_name = $2;`
 	if _, err := p.db.Exec(query, price, name); err != nil {
+		fmt.Println(err)
+		return err
+	}
+	query = `INSERT INTO currency_history (currency_name, exchange_price) VALUES ($1, $2);`
+	if _, err := p.db.Exec(query, name, price); err != nil {
 		fmt.Println(err)
 		return err
 	}
@@ -193,21 +224,6 @@ func (p *Postgres) GetState() (map[string]float64, error) {
 	return m, nil
 }
 
-/*
-	func generateUpdateQuery(m map[string]float64) string {
-		b := "UPDATE currency_table SET exchange_price = CASE "
-		mid := " END WHERE currency_name IN "
-		var q []string
-		var i []string
-		for name, value := range m {
-			i = append(i, fmt.Sprintf("'%s'", name))
-			s := fmt.Sprintf("WHEN currency_name = '%s' THEN %.2f", name, value)
-			q = append(q, s)
-		}
-		e := b + strings.Join(q, " ") + mid + "(" + strings.Join(i, ",") + ")" + ";"
-		return e
-	}
-*/
 func generateDefaultInsertQuery(m map[string]float64) string {
 	b := "INSERT INTO currency_table (currency_name, exchange_price) VALUES"
 	var values []string
@@ -225,9 +241,11 @@ func (p *Postgres) RegisterUser(user user.User) error {
 	email := user.Email
 	password := user.Password
 	b, err := p.checkUnique(name, email)
-	if err != nil || !b {
-		log.Print(err)
+	if err != nil {
 		return err
+	}
+	if !b {
+		return errors.New("not unique")
 	}
 	query := `INSERT INTO user_table (ID,username,email,password,created_at) VALUES ($1,$2,$3,$4,$5)`
 	_, err = p.db.Exec(query, id, name, email, password, time.Now())
@@ -236,6 +254,10 @@ func (p *Postgres) RegisterUser(user user.User) error {
 	}
 	//set wallet to new user
 	err = p.setBalance(id)
+	if err != nil {
+		return err
+	}
+	err = p.SetWalletBalance(10000.0, id)
 	if err != nil {
 		return err
 	}
@@ -299,15 +321,27 @@ func (p *Postgres) CheckBalance(userID uuid.UUID) (float64, error) {
 	return money, nil
 }
 
-// assuming that we have enough money to buy
 func (p *Postgres) BuyResource(userID uuid.UUID, name string, q float64, purchasePrice float64) error {
-	// add resource to resource_table
-	query := `INSERT INTO resource_table (user_id, resource, quantity) 
-VALUES ($1, $2, $3) 
-ON CONFLICT (user_id, resource) 
-DO UPDATE SET quantity = resource_table.quantity + EXCLUDED.quantity;
-`
-	_, err := p.db.Exec(query, userID, name, q)
+	//check if we have enough money
+	var walletMoney float64
+	query := `SELECT money FROM wallet_table WHERE user_id=$1`
+	err := p.db.QueryRow(query, userID).Scan(&walletMoney)
+	if err != nil {
+		return err
+	}
+	fmt.Println(purchasePrice)
+	fmt.Println(walletMoney)
+
+	if walletMoney < math.Abs(purchasePrice) {
+		return errors.New("Not enough money")
+	}
+
+	query = `INSERT INTO resource_table (user_id, resource, quantity)
+	VALUES ($1, $2, $3)
+	ON CONFLICT (user_id, resource)
+	DO UPDATE SET quantity = resource_table.quantity + EXCLUDED.quantity;`
+
+	_, err = p.db.Exec(query, userID, name, q)
 	if err != nil {
 		return err
 	}
@@ -318,7 +352,7 @@ DO UPDATE SET quantity = resource_table.quantity + EXCLUDED.quantity;
 	}
 	// add transaction to history
 	query = `INSERT INTO history_table (user_id,resource,quantity,purchase_price,selling_price,purchase,sale,transaction_time) VALUES ($1,$2,$3,$4,0.0,TRUE,FALSE,$5)`
-	_, err = p.db.Exec(query, userID, name, q, purchasePrice, time.Now())
+	_, err = p.db.Exec(query, userID, name, q, math.Abs(purchasePrice), time.Now())
 	if err != nil {
 		return err
 	}
@@ -326,23 +360,38 @@ DO UPDATE SET quantity = resource_table.quantity + EXCLUDED.quantity;
 
 }
 
-// asume that we have enough resource to sell
 func (p *Postgres) SellResource(userID uuid.UUID, name string, q float64, sellingPrice float64) error {
-	// add resource to resource_table
-	query := `UPDATE resource_table SET quantity = quantity - $1 WHERE user_id = $2 AND resource=$3`
-
-	_, err := p.db.Exec(query, q, userID, name)
+	tx, err := p.db.Begin()
 	if err != nil {
 		return err
 	}
-	// change money in wallet
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	var quantity float64
+	query := `SELECT quantity FROM resource_table WHERE resource = $1 AND user_id=$2`
+	tx.QueryRow(query, name, userID).Scan(&quantity)
+
+	if quantity < q {
+		return errors.New("You do not have enugh resource to sell")
+	}
+
+	query = `UPDATE resource_table SET quantity = quantity - $1 WHERE user_id = $2 AND resource=$3`
+
+	_, err = tx.Exec(query, q, userID, name)
+	if err != nil {
+		return err
+	}
 	err = p.UpdateWalletBalance(sellingPrice, userID)
 	if err != nil {
 		return err
 	}
-	// add transaction to history
 	query = `INSERT INTO history_table (user_id,resource,quantity,purchase_price,selling_price,purchase,sale,transaction_time) VALUES ($1,$2,$3,0.0,$4,FALSE,TRUE,$5)`
-	_, err = p.db.Exec(query, userID, name, q, sellingPrice, time.Now())
+	_, err = tx.Exec(query, userID, name, q, sellingPrice, time.Now())
 	if err != nil {
 		return err
 	}
@@ -358,4 +407,100 @@ func (p *Postgres) UpdateWalletBalance(x float64, userID uuid.UUID) error {
 	}
 	return nil
 
+}
+func (p *Postgres) SetWalletBalance(x float64, userID uuid.UUID) error {
+	query := `UPDATE wallet_table SET money = $1 WHERE user_id = $2`
+	_, err := p.db.Exec(query, x, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (p *Postgres) ChartData(name string) ([]customType.ChartStockInfo, error) {
+	query := `SELECT (exchange_price,time_at) FROM currency_history WHERE currency_name=$1 AND WHERE time_at >= CURRENT_DATE - INTERVAL '30 days'`
+	rows, err := p.db.Query(query, name)
+	if err != nil {
+		return nil, err
+	}
+	var s []customType.ChartStockInfo
+	for rows.Next() {
+		var c customType.ChartStockInfo
+		var price float64
+		var t time.Time
+		err := rows.Scan(&price, &t)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		c.Name = name
+		c.Price = price
+		c.TimeAt = t
+
+		s = append(s, c)
+
+	}
+	return s, nil
+
+}
+
+func (p *Postgres) GetCurrencyList() ([]string, error) {
+	query := `SELECT currency_name FROM currency_table`
+	rows, err := p.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	var s []string
+	for rows.Next() {
+		var name string
+		err := rows.Scan(&name)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		s = append(s, name)
+	}
+	return s, nil
+}
+
+func (p *Postgres) GetCurrencyOwnState(id uuid.UUID, name string) (float64, error) {
+	query := `SELECT quantity FROM resource_table WHERE user_id = $1 AND resource = $2`
+	var quantity float64
+	err := p.db.QueryRow(query, id, name).Scan(&quantity)
+	if err != nil {
+		return .0, err
+	}
+	return quantity, nil
+}
+
+func (p *Postgres) GetYourStocks(userID uuid.UUID) (map[string]float64, error) {
+	m := make(map[string]float64)
+	query := `SELECT resource,quantity FROM resource_table WHERE user_id = $1`
+	rows, err := p.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var name string
+		var quantity float64
+		err = rows.Scan(&name, &quantity)
+		if err != nil {
+			continue
+		}
+		m[name] = quantity
+	}
+
+	return m, err
+
+}
+
+func (p *Postgres) GetUsername(userID uuid.UUID) (string, error) {
+	query := `SELECT username FROM user_table WHERE id=$1`
+	var username string
+	err := p.db.QueryRow(query, userID).Scan(&username)
+	if err != nil {
+		return "", err
+	}
+	return username, nil
 }

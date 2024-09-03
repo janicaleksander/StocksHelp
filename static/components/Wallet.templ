@@ -1,0 +1,62 @@
+package components
+
+import "strconv"
+
+templ Wallet(m map[string]float64) {
+<html>
+    <head>
+        <!-- Tailwind CSS -->
+        <link href="./static/css/tailwind.css" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+
+        <script>
+            htmx.onLoad(function(content) {
+                initFlowbite();
+            })
+        </script>
+    </head>
+
+    <body class="bg-gradient-to-r from-indigo-50 to-blue-100 font-sans leading-relaxed min-h-screen flex items-center justify-center">
+        <div class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            <!-- Title Section -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-700">Wallet Overview</h1>
+
+            </div>
+
+            <!-- Wallet Calculation Section -->
+            <div hx-get="/walletCalculate" hx-trigger="load, every 5s" hx-target="#balance">
+                <div class="p-4 mb-6 bg-indigo-100 rounded-lg shadow-sm">
+                    <span id="balance" class="text-lg font-semibold text-indigo-700">Refreshing Wallet Data...</span>
+
+                </div>
+            </div>
+
+            <!-- Wallet Content Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                for name, quantity := range m {
+                {{ stringValue := strconv.FormatFloat(quantity, 'f', 6, 64) }}
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xl font-bold text-gray-800">{name}</span>
+                        <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-200 dark:text-green-900">
+                            Active
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-4">You have <span class="font-medium text-gray-800">{stringValue}</span> units.</p>
+
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Flowbite JS -->
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+    </body>
+</html>
+}

@@ -1,0 +1,75 @@
+package components
+
+templ Register(er map[string]bool){
+<html>
+    <head>
+    <link href="./static/css/tailwind.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+
+
+    </head>
+
+        <body>
+        <section class="bg-gray-50 dark:bg-gray-900">
+          <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+              <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                  <img class="w-8 h-8 mr-2" src="./static/img/cash.png" alt="logo">
+                  StocksMaster
+              </a>
+              <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                  <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                      <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                          Create an account
+                      </h1>
+                      <form class="space-y-4 md:space-y-6"  METHOD="POST" action="/register">
+                         <div>
+                            <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your username</label>
+                            <input type="username" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="username" required="">
+                          </div>
+                          <div>
+                              <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                              <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="">
+                          </div>
+                          <div>
+                              <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                              <input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="">
+                          </div>
+                          <div>
+                              <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                              <input type="password" name="confirm-password" id="confirm-password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="">
+                          </div>
+
+                          <button type="submit" class="w-full text-c6 bg-c2 hover:bg-c1 focus:ring-4 focus:outline-none focus:ring-c4 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create an account</button>
+
+                             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                              Already have an account? <a href="/login" class="font-medium text-c6 hover:underline dark:text-primary-500">Login here</a>
+                          </p>
+                      </form>
+                                  if er["Different passwords"]{
+                                      <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                                        <span class="font-medium">Warning!</span>Passwords doesn't match!
+                                      </div>
+                                  }
+                                  if er["Not unique"]{
+                                      <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                                        <span class="font-medium">Warning!</span>Email or username is not unique!
+                                      </div>
+                                  }
+                  </div>
+              </div>
+          </div>
+        </section>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+        </body>
+
+
+
+</html>
+
+
+}

@@ -1,0 +1,73 @@
+package components
+templ Home(){
+<html>
+    <head>
+    <link href="./static/css/tailwind.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+
+
+    </head>
+
+        <body>
+        // nav  + stockHelp
+        @Navbar()
+<div id="stocks-propose"
+     class="mt-6 grid grid-cols-1 gap-4 justify-items-center mx-auto  rounded-lg shadow-md p-4"
+     hx-swap="innerHTML">
+
+    <div class="w-full">
+        <div class="bg-white rounded-lg shadow-lg p-6 hover:bg-gray-100 transition duration-200 ease-in-out"
+             hx-get="/onestock"
+             hx-trigger="load, every 5s"
+             hx-swap="innerHTML">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Random Stock</h2>
+        </div>
+    </div>
+
+</div>
+
+
+
+        // Lorem
+<div class="flex flex-col items-center justify-center h-[213px] mb-8 md:flex-row">
+    <p class="text-9xl font-bold text-center md:text-4xl">STOCKS</p>
+    <p class="text-6xl font-bold text-center md:text-2xl">BUY BETTER</p>
+    <p class="text-3xl font-bold text-center md:text-xl">BUY SMARTER</p>
+</div>
+
+
+
+        <div class="flex items-center justify-center px-8">
+          <p class="text-xs text-center max-w-[60%]">
+Stocks are typically bought and sold on exchanges such as the New York Stock Exchange (NYSE) or NASDAQ in the United States, but there are numerous stock markets around the world. Investors can earn returns through price appreciation, where the value of the stock increases over time, or through dividends, which are payments made by the company to its shareholders.
+
+The stock market is influenced by several key factors: economic indicators like GDP growth, employment rates, and inflation; company-specific news such as earnings reports and management changes; and broader geopolitical events that can affect investor confidence. To make informed investment decisions, it's crucial to understand both fundamental analysis, which evaluates a company's intrinsic value, and technical analysis, which studies price patterns and market trends.
+
+          </p>
+        </div>
+        // photos + lorem
+        <div class="grid grid-cols-2 mt-14">
+        <img src="./static/img/mock.jpg" class="object-cover w-4/5 h-4/5 px-8">
+        <p class="flex items-center justify-center text-center px-12">The stock market is a thrilling arena where fortunes can be made or lost in an instant. It’s where companies go public, offering shares to investors eager to own a piece of the action. From tech giants like Apple and Amazon to emerging startups, the stock market is the beating heart of capitalism. Investors buy and sell shares, aiming to capitalize on market trends, news, and economic shifts. The excitement comes from the market's volatility—prices can soar or plummet based on earnings reports, new product launches, or geopolitical events. For many, it's more than just numbers; it's a dynamic world of strategy, risk, and reward. </p>
+        </div>
+
+        @footer()
+
+
+
+
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+        </body>
+
+
+
+</html>
+
+
+}

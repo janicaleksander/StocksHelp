@@ -23,7 +23,7 @@ func NewMockExchange(s db.Storage) *MockExchange {
 	}
 }
 func (m *MockExchange) MockGenerate() {
-	symbols := []string{"ZORAX", "NUVEX", "RIVEX", "YOLAX", "QUFEX", "MIREX", "DORAX", "XALOR", "VIXOR", "JUMEX", "ZEPIX", "TULAX", "KORIX", "BEFEX", "ZAMEX", "NERIX", "LIFEX", "GOFEX", "PURIX", "WIBEX", "YASIX", "QIRAX", "HOVIX", "GEMIX", "LUPIX", "VERIX", "FENIX", "QOLAX", "DURIX", "RIXON", "YURIX", "ZORIX", "MAFIX", "XENIX", "NIXON", "QENIX", "TORAX", "JUXON", "XIRAX", "BAFIX", "RUFEX", "LEMIX", "ZIRAX", "VUNIX", "KAVIX", "ZUFIX", "MUNIX", "WOFIX", "QIFEX", "YIMEX", "TIFEX", "YEMIX", "XAFEX", "GUFIX", "NAFIX", "VURIX", "RALIX", "PUFIX", "QUNIX", "ZAFIX", "KOFIX", "FEXOR", "REXON", "QORIX", "LIFON", "XOVIX", "MEXOR", "DUVIX", "YUFIX", "ZIVON", "JEXON", "KILAX", "YIFEX", "BORIX", "QAVIX", "ZOVIX", "GUXON", "VELAX", "MERIX", "NUFIX", "XURIX", "TAVIX", "ROLIX", "YUVIX", "ZALIX", "KIFEX", "QULIX", "VORIX", "ZUNIX", "MIFEX", "WEXOR", "XOFIX", "FULIX", "QEFIX", "VILAX", "YOFIX", "REMIX", "ZUFIX", "NIXOR", "YIFIX"}
+	symbols := []string{"ZORAX", "NUVEX", "RIVEX", "YOLAX", "QUFEX", "MIREX", "DORAX", "XALOR", "VIXOR", "JUMEX"}
 	b, err := m.storage.CheckFirst()
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +49,8 @@ func (m *MockExchange) MockGenerate() {
 		m.Mu.Lock()
 		m.ChangePrice()
 		m.Mu.Unlock()
-		time.Sleep(time.Second * 1)
+		//time.Sleep(time.Hour * 1)
+		time.Sleep(time.Second * 10)
 	}
 
 }

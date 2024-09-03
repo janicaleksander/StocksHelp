@@ -2,7 +2,6 @@ package market
 
 import (
 	"github.com/janicaleksander/StocksHelp/external"
-	"log"
 	"time"
 )
 
@@ -29,12 +28,10 @@ func (m *Market) Run() {
 				m.Ext.Mu.Lock()
 				price, ok := m.Ext.Values[cName]
 				m.Ext.Mu.Unlock()
-				if !ok {
-					log.Print("Dont have this currency")
-					return
+				if ok {
+					m.OutputChan <- price
 				}
-
-				m.OutputChan <- price
+				//m.OutputChan <- price
 			}()
 		default:
 			time.Sleep(time.Millisecond * 100)

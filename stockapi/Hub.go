@@ -123,6 +123,7 @@ func (h *Hub) Run() {
 func (h *Hub) SubscribeMarket(m *market.Market) error {
 	h.MarketConns[m] = true
 	return nil
+
 }
 
 func (h *Hub) MakeCurrencyRequest(marketName, action, name string) (Response, error) {
@@ -152,7 +153,7 @@ func (h *Hub) MakeCurrencyRequest(marketName, action, name string) (Response, er
 			Data:    name,
 			Date:    time.Now(),
 		}
-		resp := <-h.OutputChannels["c2"]
+		resp := <-h.OutputChannels["c3"]
 		return resp, nil
 	}
 

@@ -1,0 +1,19 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - go build -v main.go
+      - npx tailwindcss build -i static/css/style.css -o static/css/tailwind.css --watch
+      - templ generate
+
+  templ:
+    cmds:
+      - TEMPL_EXPERIMENT=rawgo templ generate -watch -proxy=http://localhost:5050
+  tailwind:
+    cmds:
+      -  npx tailwindcss build -i ./static/css/style.css -o ./static/css/tailwind.css --watch
+
+  assets:
+    cmds:
+    # Add your asset-related commands here if needed

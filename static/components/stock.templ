@@ -1,0 +1,24 @@
+package components
+import "strconv"
+
+templ Stock(name string, price float64) {
+    <!-- Wrapper to align the stock component -->
+    <div class="flex items-center bg-c3 shadow-md rounded-lg overflow-hidden">
+
+        <!-- Icon Section -->
+        <div class="bg-c7 flex items-center justify-center w-16 h-16">
+            <img src="./static/img/profit.png" alt="Profit Icon" class="object-cover w-10 h-10">
+        </div>
+
+        <!-- Stock Name Section -->
+        <div class="flex-1 bg-c1 flex items-center pl-4 text-c6 font-bold h-16">
+            <span class="text-lg md:text-xl">{name}</span>
+        </div>
+
+        <!-- Price Section -->
+        <div class="flex-1 bg-c2 flex items-center justify-end pr-4 text-c6 h-16">
+            {{ p := strconv.FormatFloat(price, 'f', 2, 64) }}
+            <span class="text-lg font-semibold md:text-xl">{p}</span>
+        </div>
+    </div>
+}

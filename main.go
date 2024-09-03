@@ -27,7 +27,7 @@ func main() {
 	go hub.Run()
 	go mockExchange.MockGenerate()
 
-	server := httpapi.NewServer(":8080", hub)
+	server := httpapi.NewServer(":5050", hub)
 	server.Run()
 
 }

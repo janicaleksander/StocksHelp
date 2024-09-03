@@ -13,6 +13,11 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func DefaultCookie(c *http.Cookie) {
+	c.Value = ""
+	c.Expires = time.Now().Add(time.Hour * (-1))
+
+}
 func CreateJWTCookieUser(w http.ResponseWriter, r *http.Request, userID uuid.UUID) error {
 	claims := &Claims{jwt.RegisteredClaims{
 		Issuer:    r.Host,
