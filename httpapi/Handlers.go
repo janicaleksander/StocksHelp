@@ -223,6 +223,10 @@ func (serv *Server) sidebar(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 func (serv *Server) dashboard(w http.ResponseWriter, r *http.Request) error {
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	id, err := GetUserID(r)
 	if err != nil {
 		return err
@@ -250,7 +254,10 @@ func (serv *Server) oneStock(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (serv *Server) handleMarket(w http.ResponseWriter, r *http.Request) error {
-
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	s, err := serv.Hub.Storage.GetCurrencyList()
 	if err != nil {
 		return err
@@ -293,6 +300,10 @@ func (serv *Server) calculate(w http.ResponseWriter, r *http.Request) error {
 	return WriteJson(w, 200, price*floatValue)
 }
 func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	m := make(map[string]bool)
 	id, err := GetUserID(r)
 	if err != nil {
@@ -328,6 +339,10 @@ func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (serv *Server) sell(w http.ResponseWriter, r *http.Request) error {
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	id, err := GetUserID(r)
 	m := make(map[string]bool)
 	if err != nil {
@@ -376,6 +391,10 @@ func (serv *Server) getCurrencyOwnState(w http.ResponseWriter, r *http.Request) 
 	return json.NewEncoder(w).Encode(q)
 }
 func (serv *Server) wallet(w http.ResponseWriter, r *http.Request) error {
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	id, err := GetUserID(r)
 	m, err := serv.Hub.Storage.GetYourStocks(id)
 	if err != nil {
@@ -424,6 +443,10 @@ func (serv *Server) Logout(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (serv *Server) history(w http.ResponseWriter, r *http.Request) error {
+	b, err := IsLogged(r)
+	if err != nil || !b {
+		return Render(w, r, components.LoggedOut())
+	}
 	id, err := GetUserID(r)
 	if err != nil {
 		return err
@@ -454,6 +477,15 @@ func (serv *Server) wykres(w http.ResponseWriter, r *http.Request) error {
 	k := charts.KlineExamples{}
 	k.Examples(cName, data, id)
 	renderTemplate(w, r, id)
+	defer func() {
+		url := fmt.Sprintf("./static/chart/marketChart%v.html", id)
+		err := os.Remove(url)
+		if err != nil {
+			fmt.Println("Error deleting file:", err)
+		} else {
+			fmt.Println("File deleted successfully")
+		}
+	}()
 	return nil
 }
 

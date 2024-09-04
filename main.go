@@ -16,8 +16,8 @@ func main() {
 	/*	err := godotenv.Load()
 		if err != nil {
 			log.Fatalf("Error loading .env file: %v", err)
-		}
-	*/
+		}*/
+
 	databaseAPI, err := db.NewDB()
 	if err != nil {
 		log.Fatal(err)

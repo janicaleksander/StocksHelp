@@ -47,12 +47,12 @@ type Postgres struct {
 }
 
 func NewDB() (*Postgres, error) {
-	/*
-		err := godotenv.Load()
+
+	/*	err := godotenv.Load()
 		if err != nil {
 			log.Fatal("Error loading .env file")
-		}
-	*/
+		}*/
+
 	dbUser := os.Getenv("DBUSER")
 	dbPassword := os.Getenv("DBPASSWORD")
 	dbHost := os.Getenv("DBHOST")
