@@ -3,4 +3,4 @@
 <button hx-get=\"
 \" hx-trigger=\"click\" hx-target=\"#space\" class=\"block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white\">
 </button></li>
-</ul></div><div id=\"space\"></div><script src=\"https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js\"></script></body></html>
+</ul></div><div id=\"space\"></div><div id=\"#chart\"></div><script src=\"https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js\"></script></body></html>

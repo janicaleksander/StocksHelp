@@ -13,11 +13,11 @@ import (
 
 func main() {
 	// Load environment variables if needed
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatalf("Error loading .env file: %v", err)
-	// }
-
+	/*	err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		}
+	*/
 	databaseAPI, err := db.NewDB()
 	if err != nil {
 		log.Fatal(err)
@@ -34,7 +34,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "5050"
 	}
 
 	address := fmt.Sprintf("0.0.0.0:%s", port)

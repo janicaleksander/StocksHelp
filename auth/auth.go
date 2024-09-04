@@ -24,8 +24,8 @@ func CreateJWTCookieUser(w http.ResponseWriter, r *http.Request, userID uuid.UUI
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}}
-
-	/*	err := godotenv.Load()
+	/*
+		err := godotenv.Load()
 		if err != nil {
 			return err
 		}*/

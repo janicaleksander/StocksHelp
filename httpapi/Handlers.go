@@ -1,19 +1,23 @@
 package httpapi
 
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"github.com/a-h/templ"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/janicaleksander/StocksHelp/auth"
+	"github.com/janicaleksander/StocksHelp/charts"
 	"github.com/janicaleksander/StocksHelp/customType"
 	"github.com/janicaleksander/StocksHelp/static/components"
 	"github.com/janicaleksander/StocksHelp/user"
+	"html/template"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 )
@@ -259,13 +263,9 @@ func (serv *Server) handleMarket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (serv *Server) wykres(w http.ResponseWriter, r *http.Request) error {
-	Render(w, r, components.Chart1([]int{35, 3454, 356, 3454, 2, 34, 5678}))
-	return nil
-}
-
 func (serv *Server) stockInfo(w http.ResponseWriter, r *http.Request) error {
 	currencyName := r.URL.Query().Get("cname")
+	//serv.wykres(w, r)
 	Render(w, r, components.TransactionPanel(currencyName))
 	return nil
 }
@@ -432,6 +432,41 @@ func (serv *Server) history(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	slices.SortFunc(s, func(a, b customType.TransactionHistory) int {
+		return cmp.Compare(b.TransactionTime.Unix(), a.TransactionTime.Unix())
+	})
 
 	return Render(w, r, components.History(s))
+}
+
+func (serv *Server) wykres(w http.ResponseWriter, r *http.Request) error {
+	id, err := GetUserID(r)
+	if err != nil {
+		return err
+	}
+	cName := r.URL.Query().Get("cName")
+	fmt.Println("c", cName)
+	data, err := serv.Hub.Storage.GetCurrencyHistory(cName)
+	if err != nil {
+		return err
+	}
+
+	k := charts.KlineExamples{}
+	k.Examples(cName, data, id)
+	renderTemplate(w, r, id)
+	return nil
+}
+
+func renderTemplate(w http.ResponseWriter, r *http.Request, id uuid.UUID) {
+	url := fmt.Sprintf("./static/chart/marketChart%v.html", id.String())
+	tmpl, err := template.ParseFiles(url)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

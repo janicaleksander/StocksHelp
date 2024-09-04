@@ -15,14 +15,32 @@ templ TransactionPanel(checkBox string) {
         <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
 
         <script>
-            htmx.onLoad(function(content) {
-                initFlowbite();
-            })
+           htmx.onLoad(function(content) {
+               if (typeof echarts === 'undefined') {
+                   var script = document.createElement('script');
+                   script.src = "https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js";
+                   document.head.appendChild(script);
+                   script.onload = function() {
+                       initFlowbite();
+                   };
+               } else {
+                   initFlowbite();
+               }
+           });
         </script>
     </head>
+
     <body class="font-sans bg-gray-100 dark:bg-gray-900">
+
+    {{
+    str := fmt.Sprintf("/wykres?cName=%v",checkBox)
+    }}
+    <div id="chart" hx-get={str} hx-trigger="load,every 60s" hx-target="this">
+    Chart...
+    </div>
         <div class="max-w-md mx-auto mt-10 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4">You are watching {checkBox}</h2>
+
 
             {{
             currentPrice := fmt.Sprintf("/stockPrice?pstock=%v", checkBox)

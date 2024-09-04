@@ -16,6 +16,10 @@ templ History(s []customType.TransactionHistory) {
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+
     <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
     <script>
         htmx.onLoad(function(content) {
@@ -35,21 +39,25 @@ templ History(s []customType.TransactionHistory) {
                         <span class="text-2xl font-semibold text-gray-900">{info.Resource}</span>
                     if info.Purchase{
                           {{  priceStr := strconv.FormatFloat(info.PurchasePrice, 'f', 2, 64) }}
+                          {{  q := strconv.FormatFloat(info.Quantity, 'f', 2, 64) }}
                             <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium mr-2 px-3 py-1 rounded-full">
                                 BUY
                             </span>
                             <div class="text-gray-700">
                                 Purchase Price: { priceStr}
+                                Quantiy: { q }
                             </div>
                     }
                     if info.Sale{
                            {{ priceStr := strconv.FormatFloat(info.SellingPrice, 'f', 2, 64) }}
+                            {{  q := strconv.FormatFloat(info.Quantity, 'f', 2, 64) }}
                             <span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium mr-2 px-3 py-1 rounded-full">
                                 SELL
                             </span>
                             <div class="text-gray-700">
                                 Selling Price: { priceStr }
                             </div>
+                            <p>Quantity { q } </p>
                     }
                     </div>
                     <div class="text-gray-600 text-sm">
@@ -62,6 +70,8 @@ templ History(s []customType.TransactionHistory) {
         }
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
     <!-- Flowbite JS -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
 </body>

@@ -1,10 +1,13 @@
 package db
 
 import (
+	"cmp"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/janicaleksander/StocksHelp/charts"
 	"github.com/janicaleksander/StocksHelp/customType"
 	"github.com/janicaleksander/StocksHelp/user"
 	_ "github.com/lib/pq"
@@ -12,6 +15,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -35,6 +39,7 @@ type Storage interface {
 	GetUsername(userID uuid.UUID) (string, error)
 	SetWalletBalance(x float64, userID uuid.UUID) error
 	GetHistory(userID uuid.UUID) ([]customType.TransactionHistory, error)
+	GetCurrencyHistory(name string) ([]charts.KlineData, error)
 }
 
 type Postgres struct {
@@ -42,12 +47,12 @@ type Postgres struct {
 }
 
 func NewDB() (*Postgres, error) {
-
-	/*	err := godotenv.Load()
+	/*
+		err := godotenv.Load()
 		if err != nil {
 			log.Fatal("Error loading .env file")
-		}*/
-
+		}
+	*/
 	dbUser := os.Getenv("DBUSER")
 	dbPassword := os.Getenv("DBPASSWORD")
 	dbHost := os.Getenv("DBHOST")
@@ -532,4 +537,59 @@ func (p *Postgres) GetHistory(userID uuid.UUID) ([]customType.TransactionHistory
 	}
 	return s, nil
 
+}
+
+func (p *Postgres) GetCurrencyHistory(name string) ([]charts.KlineData, error) {
+	//query := `SELECT DATE(time_at) AS date, ARRAY_AGG(exchange_price ORDER BY time_at) AS prices,  ARRAY_AGG(time_at ORDER BY time_at) AS times FROM currency_history WHERE currency_name = $1 GROUP BY DATE(time_at) ORDER BY date DESC;`
+	query := `SELECT DATE(time_at) AS date, 
+       TO_JSON(ARRAY_AGG(exchange_price ORDER BY time_at)) AS prices_json, 
+       TO_JSON(ARRAY_AGG(time_at ORDER BY time_at)) AS times_json
+FROM currency_history 
+WHERE currency_name = $1 
+GROUP BY DATE(time_at) 
+ORDER BY date ASC;
+`
+	rows, err := p.db.Query(query, name)
+	if err != nil {
+		return nil, err
+	}
+	var s []charts.KlineData
+	for rows.Next() {
+		var d charts.KlineData
+		var date time.Time
+		var pricesJSON, timesJSON string
+		var prices []float64
+		var times []time.Time
+		var openPrice float64
+		var closePrice float64
+
+		err = rows.Scan(&date, &pricesJSON, &timesJSON)
+		if err != nil {
+			continue
+		}
+		if err := json.Unmarshal([]byte(pricesJSON), &prices); err != nil {
+			return nil, err
+		}
+		openPrice = prices[0]
+		closePrice = prices[len(prices)-1]
+		if err := json.Unmarshal([]byte(timesJSON), &times); err != nil {
+			return nil, err
+		}
+		d.Date = date.Format("2006-01-02")
+
+		slices.SortFunc(prices, func(a, b float64) int {
+			return cmp.Compare(a, b)
+		})
+
+		if len(prices) > 0 {
+			maxV := prices[len(prices)-1]
+			minV := prices[0]
+			d.Data = [4]float64{openPrice, closePrice, minV, maxV}
+		} else {
+			d.Data = [4]float64{0, 0, 0, 0}
+		}
+
+		s = append(s, d)
+	}
+	return s, nil
 }

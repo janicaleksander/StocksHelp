@@ -1368,6 +1368,10 @@ input:checked + .toggle-bg {
   grid-row: span 2 / span 2;
 }
 
+.m-2 {
+  margin: 0.5rem;
+}
+
 .m-4 {
   margin: 1rem;
 }
@@ -1469,6 +1473,10 @@ input:checked + .toggle-bg {
 
 .mr-6 {
   margin-right: 1.5rem;
+}
+
+.ms-1 {
+  margin-inline-start: 0.25rem;
 }
 
 .ms-2 {
@@ -2556,6 +2564,10 @@ input:checked + .toggle-bg {
   padding-bottom: 2rem;
 }
 
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
 .pe-9 {
   padding-inline-end: 2.25rem;
 }
@@ -2582,6 +2594,10 @@ input:checked + .toggle-bg {
 
 .pt-2 {
   padding-top: 0.5rem;
+}
+
+.pt-5 {
+  padding-top: 1.25rem;
 }
 
 .pt-6 {
@@ -2677,6 +2693,10 @@ input:checked + .toggle-bg {
   font-weight: 500;
 }
 
+.font-normal {
+  font-weight: 400;
+}
+
 .font-semibold {
   font-weight: 600;
 }
@@ -2695,6 +2715,10 @@ input:checked + .toggle-bg {
 
 .leading-9 {
   line-height: 2.25rem;
+}
+
+.leading-none {
+  line-height: 1;
 }
 
 .leading-relaxed {

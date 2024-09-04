@@ -66,16 +66,26 @@ func (m *MockExchange) ChangePrice() {
 	m.storage.UpdatePrice(a, newPrice)
 }
 func changePriceHelper(price float64) float64 {
-	strategy := rand.Intn(4)
+	strategy := rand.Intn(7)
 	switch strategy {
 	case 0:
 		return 1 + (rand.Float64()-0.5)*0.02 + price*(1+(rand.Float64()-0.5)*0.02)
 	case 1:
 		return 1 + (rand.Float64()-0.5)*0.02 + price*(1+(rand.Float64()-0.5)*0.06)
 	case 2:
-		return 1 + (rand.Float64()-0.5)*0.02 + price*(1+rand.Float64()*0.05)
+		return 1 + (rand.Float64()-0.5)*0.02 + price*(1+rand.Float64()*0.10)
 	case 3:
-		return 1 + (rand.Float64()-0.5)*0.02 + price*(1-rand.Float64()*0.05)
+		return 1 + (rand.Float64()-0.5)*0.02 + price*(1-rand.Float64()*0.10)
+	case 4:
+		return 1 + (rand.Float64()-0.5)*0.02 + price*(1+rand.Float64()*0.20)
+	case 5:
+		return 1 + (rand.Float64()-0.5)*0.02 + price*(1-rand.Float64()*0.20)
+	case 6:
+		if rand.Intn(2) == 0 {
+			return 1 + (rand.Float64()-0.5)*0.02 + price*(1+rand.Float64()*0.50)
+		} else {
+			return 1 + (rand.Float64()-0.5)*0.02 + price*(1-rand.Float64()*0.50)
+		}
 	}
 	return price
 }
