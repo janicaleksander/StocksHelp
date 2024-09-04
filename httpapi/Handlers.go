@@ -312,7 +312,7 @@ func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
 		return Render(w, r, components.Alert(m))
 	}
 	floatValueQ, err := strconv.ParseFloat(quantity, 64)
-	if floatValueQ <= 0 {
+	if floatValueQ <= 0 || err != nil {
 		m["Invalid input"] = true
 		return Render(w, r, components.Alert(m))
 	}
@@ -346,7 +346,7 @@ func (serv *Server) sell(w http.ResponseWriter, r *http.Request) error {
 		return Render(w, r, components.Alert(m))
 	}
 	floatValueQ, err := strconv.ParseFloat(quantity, 64)
-	if floatValueQ <= 0 {
+	if floatValueQ <= 0 || err != nil {
 		m["Invalid input"] = true
 		return Render(w, r, components.Alert(m))
 	}
