@@ -307,7 +307,16 @@ func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
 	}
 	price := resp.Data.(float64)
 	quantity := r.URL.Query().Get("inputQuantity")
+	if quantity == "" {
+		m["Invalid input"] = true
+		return Render(w, r, components.Alert(m))
+	}
 	floatValueQ, err := strconv.ParseFloat(quantity, 64)
+	if floatValueQ <= 0 {
+		m["Invalid input"] = true
+		return Render(w, r, components.Alert(m))
+	}
+
 	err = serv.Hub.Storage.BuyResource(id, currencyName, floatValueQ, -price*floatValueQ)
 	if err != nil {
 		m["Oh, you do not have enough money to do this"] = true
@@ -332,8 +341,15 @@ func (serv *Server) sell(w http.ResponseWriter, r *http.Request) error {
 	}
 	price := resp.Data.(float64)
 	quantity := r.URL.Query().Get("inputQuantity")
-
+	if quantity == "" {
+		m["Invalid input"] = true
+		return Render(w, r, components.Alert(m))
+	}
 	floatValueQ, err := strconv.ParseFloat(quantity, 64)
+	if floatValueQ <= 0 {
+		m["Invalid input"] = true
+		return Render(w, r, components.Alert(m))
+	}
 	err = serv.Hub.Storage.SellResource(id, currencyName, floatValueQ, price*floatValueQ)
 	if err != nil {
 		log.Println(err)
