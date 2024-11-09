@@ -316,6 +316,7 @@ func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
 		return Render(w, r, components.Alert(m))
 
 	}
+
 	price := resp.Data.(float64)
 	quantity := r.URL.Query().Get("inputQuantity")
 	if quantity == "" {
@@ -405,7 +406,7 @@ func (serv *Server) wallet(w http.ResponseWriter, r *http.Request) error {
 func (serv *Server) walletCalculate(w http.ResponseWriter, r *http.Request) error {
 	id, err := GetUserID(r)
 	m, err := serv.Hub.Storage.GetYourStocks(id)
-	fmt.Println("Your stock:", m)
+
 	if err != nil {
 		log.Println(err)
 		return err
@@ -418,10 +419,13 @@ func (serv *Server) walletCalculate(w http.ResponseWriter, r *http.Request) erro
 		}
 		amount += resp.Data.(float64) * quantity
 	}
-	err = serv.Hub.Storage.SetWalletBalance(amount, id)
-	if err != nil {
-		return err
+	if m != nil {
+		err = serv.Hub.Storage.SetWalletBalance(amount, id)
+		if err != nil {
+			return err
+		}
 	}
+
 	return WriteJson(w, 200, amount)
 }
 
