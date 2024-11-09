@@ -425,8 +425,12 @@ func (serv *Server) walletCalculate(w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return err
 	}
+	balance, err := serv.Hub.Storage.CheckBalance(id)
+	if err != nil {
+		return err
+	}
 
-	return WriteJson(w, 200, amount)
+	return WriteJson(w, 200, balance)
 }
 
 func (serv *Server) Logout(w http.ResponseWriter, r *http.Request) error {
