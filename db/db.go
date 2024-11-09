@@ -410,6 +410,15 @@ func (p *Postgres) UpdateWalletBalance(x float64, userID uuid.UUID) error {
 	return nil
 
 }
+func (p *Postgres) SetWalletBalance(x float64, userID uuid.UUID) error {
+	query := `UPDATE wallet_table SET money = money + $1 WHERE user_id = $2`
+	_, err := p.db.Exec(query, x, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
 
 func (p *Postgres) ChartData(name string) ([]customType.ChartStockInfo, error) {
 	query := `SELECT (exchange_price,time_at) FROM currency_history WHERE currency_name=$1 AND WHERE time_at >= CURRENT_DATE - INTERVAL '30 days'`
