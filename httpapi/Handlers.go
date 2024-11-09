@@ -405,6 +405,7 @@ func (serv *Server) wallet(w http.ResponseWriter, r *http.Request) error {
 func (serv *Server) walletCalculate(w http.ResponseWriter, r *http.Request) error {
 	id, err := GetUserID(r)
 	m, err := serv.Hub.Storage.GetYourStocks(id)
+	fmt.Println("Your stock:", m)
 	if err != nil {
 		log.Println(err)
 		return err
