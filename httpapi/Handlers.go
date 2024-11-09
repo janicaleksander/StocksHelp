@@ -417,13 +417,13 @@ func (serv *Server) walletCalculate(w http.ResponseWriter, r *http.Request) erro
 		if err != nil {
 			continue
 		}
-		amount += resp.Data.(float64) * quantity
-	}
-	if m != nil {
-		err = serv.Hub.Storage.SetWalletBalance(amount, id)
-		if err != nil {
-			return err
+		if quantity != 0 {
+			amount += resp.Data.(float64) * quantity
 		}
+	}
+	err = serv.Hub.Storage.UpdateWalletBalance(amount, id)
+	if err != nil {
+		return err
 	}
 
 	return WriteJson(w, 200, amount)
