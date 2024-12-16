@@ -331,6 +331,7 @@ func (serv *Server) buy(w http.ResponseWriter, r *http.Request) error {
 
 	err = serv.Hub.Storage.BuyResource(id, currencyName, floatValueQ, -price*floatValueQ)
 	if err != nil {
+		fmt.Println("tu error:", err)
 		m["Oh, you do not have enough money to do this"] = true
 		return Render(w, r, components.Alert(m))
 
