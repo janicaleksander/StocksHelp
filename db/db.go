@@ -324,6 +324,7 @@ func (p *Postgres) CheckBalance(userID uuid.UUID) (float64, error) {
 }
 
 func (p *Postgres) BuyResource(userID uuid.UUID, name string, q float64, purchasePrice float64) error {
+	//check if we have enough money
 	var walletMoney float64
 	query := `SELECT money FROM wallet_table WHERE user_id=$1`
 	err := p.db.QueryRow(query, userID).Scan(&walletMoney)
@@ -334,58 +335,33 @@ func (p *Postgres) BuyResource(userID uuid.UUID, name string, q float64, purchas
 	fmt.Println(walletMoney)
 
 	if walletMoney < math.Abs(purchasePrice) {
-		return errors.New("not enough money")
+		return errors.New("Not enough money")
 	}
 
-	tx, err := p.db.Begin()
+	query = `INSERT INTO resource_table (user_id, resource, quantity)
+	VALUES ($1, $2, $3)
+	ON CONFLICT (user_id, resource)
+	DO UPDATE SET quantity = resource_table.quantity + EXCLUDED.quantity;`
+
+	_, err = p.db.Exec(query, userID, name, q)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	var currentQuantity float64
-	querySelect := `SELECT quantity FROM resource_table WHERE user_id=$1 AND resource=$2`
-	err = tx.QueryRow(querySelect, userID, name).Scan(&currentQuantity)
-
-	if err == sql.ErrNoRows {
-		queryInsert := `INSERT INTO resource_table (user_id, resource, quantity) VALUES ($1, $2, $3)`
-		_, err = tx.Exec(queryInsert, userID, name, q)
-		if err != nil {
-			return err
-		}
-	} else if err == nil {
-		queryUpdate := `UPDATE resource_table SET quantity = quantity + $3 WHERE user_id=$1 AND resource=$2`
-		_, err = tx.Exec(queryUpdate, userID, name, q)
-		if err != nil {
-			return err
-		}
-	} else {
-		return err
-	}
-
+	// change money in wallet
 	err = p.UpdateWalletBalance(purchasePrice, userID)
 	if err != nil {
 		return err
 	}
-
-	queryHistory := `INSERT INTO history_table (user_id, resource, quantity, purchase_price, selling_price, purchase, sale, transaction_time)
-		VALUES ($1, $2, $3, $4, 0.0, TRUE, FALSE, $5)`
-	_, err = tx.Exec(queryHistory, userID, name, q, math.Abs(purchasePrice), time.Now())
+	// add transaction to history
+	query = `INSERT INTO history_table (user_id,resource,quantity,purchase_price,selling_price,purchase,sale,transaction_time) VALUES ($1,$2,$3,$4,0.0,TRUE,FALSE,$5)`
+	_, err = p.db.Exec(query, userID, name, q, math.Abs(purchasePrice), time.Now())
 	if err != nil {
 		return err
 	}
-
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-
 	return nil
+
 }
+
 func (p *Postgres) SellResource(userID uuid.UUID, name string, q float64, sellingPrice float64) error {
 	tx, err := p.db.Begin()
 	if err != nil {
