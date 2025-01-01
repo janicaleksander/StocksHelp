@@ -14,6 +14,5 @@ StocksMaster is a stock market simulator.
 ```sh
 https://stocksmaster.onrender.com/home
 ```
-
-
+Due to free hosting, it takes a while to load.
 
