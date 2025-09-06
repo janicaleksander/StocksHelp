@@ -1,3 +1,4 @@
+![Opis obrazu 1](sh1.png)
 # StocksMaster
 
 StocksMaster is an engaging stock market simulation game designed to make financial literacy accessible to everyone. It provides a realistic yet risk-free environment for users to learn stock trading without the fear of losing money.
@@ -23,7 +24,7 @@ https://stocksmaster.onrender.com/home
 ```
 Due to free hosting, it takes a while to load.
 
-![Opis obrazu 1](sh1.png)
 ![Opis obrazu 2](sh2.png)
+
 
 
